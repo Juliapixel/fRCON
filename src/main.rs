@@ -1,6 +1,6 @@
 use crossterm::style::{ContentStyle, StyledContent, Stylize};
 use games::Game;
-use std::{str::FromStr, thread::sleep, time::Duration};
+use std::{fmt::Display, str::FromStr, thread::sleep, time::Duration};
 
 use argh::FromArgs;
 use shell::RCONShell;
@@ -25,9 +25,6 @@ struct Args {
         short = 'p'
     )]
     port: u16,
-
-    #[argh(option, description = "RCON password", short = 'P')]
-    password: Option<String>,
 
     #[argh(
         option,
@@ -86,11 +83,10 @@ async fn main() {
         }
     }
 
-    // Should only really fail if STDOUT or STDIN is closed, in which case a password
-    // must be provided via -p
-    let password = args.password.clone().or_else(|| rpassword::prompt_password("Insert password: ".white()).ok());
+    // Should only really fail if STDOUT or STDIN is closed
+    let password = rpassword::prompt_password("Insert password: ".white());
 
-    if let Some(password) = password {
+    if let Ok(password) = password {
         match rcon.auth(&password).await {
             Ok(_) => {
                 print_if_not_silent("Logged in.".white(), &args);
@@ -101,7 +97,7 @@ async fn main() {
             }
         }
     } else {
-        print_if_not_silent("Password must be provided either with -p or with the interactive prompt.".red(), &args);
+        print_if_not_silent("Password must be provided with the interactive prompt.".red(), &args);
         std::process::exit(1);
     }
 
