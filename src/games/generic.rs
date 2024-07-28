@@ -4,13 +4,13 @@ pub struct Generic;
 
 impl Generic {
     pub fn get_commands() -> Vec<String> {
-        return vec![];
+        vec![]
     }
 }
 
 pub fn get_output(response: &str) -> Vec<(String, ContentStyle)> {
-    return vec![(
+    vec![(
         response.to_string(),
         ContentStyle::new().attribute(Attribute::Reset),
-    )];
+    )]
 }

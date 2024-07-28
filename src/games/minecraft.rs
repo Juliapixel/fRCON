@@ -98,7 +98,7 @@ impl Minecraft {
             "xp",
         ]
         .iter()
-        .map(|s| return s.to_string())
+        .map(|s| s.to_string())
         .collect();
     }
 }
@@ -123,7 +123,7 @@ impl Response<MinecraftResponse> for MinecraftResponse {
     //Returns the most identifying part of the response. Might need to get a little more complicated with it, for example the list command identifier is very
     //short. Not sure if that's a problem.
     fn get_id_string(response: &MinecraftResponse) -> &'static str {
-        return match response {
+        match response {
             MinecraftResponse::UnknownCommand => {
                 "Unknown or incomplete command, see below for error"
             }
@@ -139,7 +139,7 @@ impl Response<MinecraftResponse> for MinecraftResponse {
             MinecraftResponse::NoElement => "Can't find element '",
             MinecraftResponse::ExpectedInteger => "Expected integer",
             MinecraftResponse::Default => "",
-        };
+        }
     }
 
     //Return an iterator of all responses (besides default, which means we don't format it)
@@ -171,12 +171,12 @@ impl Response<MinecraftResponse> for MinecraftResponse {
             }
         }
 
-        return MinecraftResponse::Default;
+        MinecraftResponse::Default
     }
 
     //Huge match statement which contains the formatting for all the responses we want to modify formatting for.
     fn get_output(response: &str) -> Vec<(String, ContentStyle)> {
-        let res_type = Self::from_response_str(&response);
+        let res_type = Self::from_response_str(response);
         let id_str = MinecraftResponse::get_id_string(&res_type);
         match res_type {
             MinecraftResponse::UnknownCommand => {
@@ -192,7 +192,7 @@ impl Response<MinecraftResponse> for MinecraftResponse {
                         .attribute(Attribute::NoUnderline),
                 ));
 
-                return response_lines;
+                response_lines
             }
             MinecraftResponse::IncorrectArg => {
                 let mut response_lines = Vec::<(String, ContentStyle)>::new();
@@ -207,21 +207,21 @@ impl Response<MinecraftResponse> for MinecraftResponse {
                         .attribute(Attribute::NoUnderline),
                 ));
 
-                return response_lines;
+                response_lines
             }
             MinecraftResponse::ListPlayers => {
                 let mut lines = Vec::<(String, ContentStyle)>::new();
                 let sections = response.split_once(":").unwrap();
                 lines.push((sections.0.to_string(), ContentStyle::new().bold()));
 
-                if sections.1.trim().len() > 0 {
+                if !sections.1.trim().is_empty() {
                     lines.push((
                         sections.1.trim().to_string(),
                         ContentStyle::new().attribute(Attribute::Reset),
                     ));
                 }
 
-                return lines;
+                lines
             }
             MinecraftResponse::Help => {
                 let mut lines = Vec::<(String, ContentStyle)>::new();
@@ -236,7 +236,7 @@ impl Response<MinecraftResponse> for MinecraftResponse {
                     }
                 }
 
-                return lines;
+                lines
             }
             //Nicely parsing the banlist response will probably require some complicated regex (due to the possibility of it containing IP addresses)
             MinecraftResponse::ListBans => {
@@ -247,17 +247,17 @@ impl Response<MinecraftResponse> for MinecraftResponse {
 
                 lines.push((sections.0.to_string(), ContentStyle::new().bold()));
 
-                if sections.1.trim().len() > 0 {
+                if !sections.1.trim().is_empty() {
                     lines.push((
                         sections.1.trim().to_string(),
                         ContentStyle::new().attribute(Attribute::Reset),
                     ));
                 }
 
-                return lines;
+                lines
             }
             MinecraftResponse::PlayerNotFound => {
-                return vec![(response.to_string(), ContentStyle::new().red())]
+                vec![(response.to_string(), ContentStyle::new().red())]
             }
             MinecraftResponse::UnknownItem => {
                 let mut lines = Vec::<(String, ContentStyle)>::new();
@@ -279,7 +279,7 @@ impl Response<MinecraftResponse> for MinecraftResponse {
                     }
                 }
 
-                return lines;
+                lines
             }
             MinecraftResponse::IntegerMin => {
                 let regex = Regex::new(id_str).unwrap();
@@ -299,7 +299,7 @@ impl Response<MinecraftResponse> for MinecraftResponse {
                     ));
                 }
 
-                return lines;
+                lines
             }
             MinecraftResponse::InvalidInteger => {
                 let mut lines = Vec::<(String, ContentStyle)>::new();
@@ -321,10 +321,10 @@ impl Response<MinecraftResponse> for MinecraftResponse {
                     }
                 }
 
-                return lines;
+                lines
             }
             MinecraftResponse::NoElement => {
-                return vec![(response.to_string(), ContentStyle::new().red())]
+                vec![(response.to_string(), ContentStyle::new().red())]
             }
             MinecraftResponse::ExpectedInteger => {
                 let mut lines = Vec::<(String, ContentStyle)>::new();
@@ -333,10 +333,10 @@ impl Response<MinecraftResponse> for MinecraftResponse {
                 lines.push((sections.0.to_string(), ContentStyle::new().red().bold()));
                 lines.push((sections.1.to_string(), ContentStyle::new().red()));
 
-                return lines;
+                lines
             }
             MinecraftResponse::Default => {
-                return vec![(response.to_string(), ContentStyle::new().white())]
+                vec![(response.to_string(), ContentStyle::new().white())]
             }
         }
     }

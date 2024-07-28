@@ -40,7 +40,7 @@ impl RCONShell<'_> {
     }
 
     pub async fn run(&mut self) -> io::Result<()> {
-        println!("{}", "\nCTRL+C or CTRL+D to quit.");
+        println!("\nCTRL+C or CTRL+D to quit.");
 
         self.shell_loop().await?;
         Ok(())
@@ -99,13 +99,12 @@ impl RCONShell<'_> {
     fn print_command_response(&mut self, res: String) -> std::io::Result<()> {
         let response_lines = (self.response_fn)(&res);
         for line in response_lines {
-            let line_with_newline: String = line.0 + "\n";
             execute!(
                 self.stdout,
                 SetStyle(ContentStyle::new().attribute(Attribute::Reset))
             )?;
             execute!(self.stdout, SetStyle(line.1))?;
-            self.stdout.write(line_with_newline.as_bytes())?;
+            println!("{}", line.0);
         }
         execute!(
             self.stdout,
@@ -124,10 +123,10 @@ struct RCONPrompt {
 
 impl RCONPrompt {
     fn create(ip: String) -> RCONPrompt {
-        return RCONPrompt {
+        RCONPrompt {
             prompt: " >>".to_string(),
             left: "[".to_string() + &ip + "]",
-        };
+        }
     }
 }
 
@@ -168,6 +167,6 @@ impl Prompt for RCONPrompt {
     }
 
     fn right_prompt_on_last_line(&self) -> bool {
-        return true;
+        true
     }
 }

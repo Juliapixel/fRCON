@@ -14,16 +14,16 @@ use self::generic::Generic;
 ///Game selection enum. Used in GameMapper and for command line arguments.
 #[derive(Clone, PartialEq)]
 pub enum Game {
-    MINECRAFT,
-    GENERIC,
+    Minecraft,
+    Generic,
 }
 
 ///Required for argh
 impl std::fmt::Display for Game {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Game::MINECRAFT => write!(f, "Minecraft"),
-            Game::GENERIC => write!(f, "generic"),
+            Game::Minecraft => write!(f, "Minecraft"),
+            Game::Generic => write!(f, "generic"),
         }
     }
 }
@@ -43,8 +43,8 @@ impl FromStr for Game {
     type Err = ParseGameError;
     fn from_str(s: &str) -> Result<Self, <Self as FromStr>::Err> {
         match s {
-            "minecraft" => return Ok(Game::MINECRAFT),
-            "generic" => return Ok(Game::GENERIC),
+            "minecraft" => Ok(Game::Minecraft),
+            "generic" => Ok(Game::Generic),
             _ => Err(ParseGameError),
         }
     }
@@ -65,15 +65,15 @@ pub struct GameMapper;
 impl GameMapper {
     pub fn get_command_fn(game: &Game) -> &'static dyn Fn() -> Vec<String> {
         match game {
-            Game::MINECRAFT => return &Minecraft::get_commands,
-            Game::GENERIC => return &Generic::get_commands,
+            Game::Minecraft => &Minecraft::get_commands,
+            Game::Generic => &Generic::get_commands,
         }
     }
 
     pub fn get_response_fn(game: &Game) -> &'static dyn Fn(&str) -> Vec<(String, ContentStyle)> {
         match game {
-            Game::MINECRAFT => return &MinecraftResponse::get_output,
-            Game::GENERIC => return &generic::get_output,
+            Game::Minecraft => &MinecraftResponse::get_output,
+            Game::Generic => &generic::get_output,
         }
     }
 }

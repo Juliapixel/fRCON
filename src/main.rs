@@ -1,6 +1,6 @@
 use crossterm::style::{ContentStyle, StyledContent, Stylize};
 use games::Game;
-use std::{fmt::Display, str::FromStr, thread::sleep, time::Duration};
+use std::{str::FromStr, thread::sleep, time::Duration};
 
 use argh::FromArgs;
 use shell::RCONShell;
@@ -77,7 +77,7 @@ async fn main() {
             print_if_not_silent("Connected to RCON.".white(), &args);
             rcon = r
         }
-        Err(e) => {
+        Err(_e) => {
             print_if_not_silent("Failed to connect to server. Is it online?".red(), &args);
             std::process::exit(1);
         }
@@ -101,11 +101,11 @@ async fn main() {
         std::process::exit(1);
     }
 
-    if args.commands.len() > 0 {
+    if !args.commands.is_empty() {
         for cmd in &args.commands {
             match rcon.send_command(cmd.trim()).await {
                 Ok(s) => {
-                    if args.silent == None {
+                    if args.silent.is_none() {
                         print_if_not_silent(s.as_str().white(), &args);
                     }
                 }
@@ -123,12 +123,9 @@ async fn main() {
     println!("Creating a {} prompt.", args.game);
     let mut shell = RCONShell::new(&mut rcon, args.game, args.address);
 
-    match shell.run().await {
-        Err(e) => {
-            println!("Shell exited with error: {}", e);
-            std::process::exit(1)
-        }
-        Ok(_) => {}
+    if let Err(e) = shell.run().await {
+        println!("Shell exited with error: {}", e);
+        std::process::exit(1)
     }
 }
 
@@ -140,7 +137,7 @@ fn print_version() {
 }
 
 fn print_if_not_silent(output: StyledContent<&str>, args: &Args) {
-    if args.silent == None {
+    if args.silent.is_none() {
         println!("{}", output);
     }
 }

@@ -12,7 +12,7 @@ pub struct RCONHighlighter {
 }
 
 impl Highlighter for RCONHighlighter {
-    fn highlight(&self, line: &str, cursor: usize) -> reedline::StyledText {
+    fn highlight(&self, line: &str, _cursor: usize) -> reedline::StyledText {
         let mut styled_text = StyledText::new();
 
         let words: Vec<&str> = line.split_inclusive(" ").collect();
@@ -34,7 +34,7 @@ impl RCONHighlighter {
     pub fn new(commands: Vec<String>, game: Game) -> RCONHighlighter {
         RCONHighlighter {
             commands,
-            is_generic: game == Game::GENERIC,
+            is_generic: game == Game::Generic,
             command_style: Style::new().fg(Color::LightYellow),
             neutral_style: Style::new().fg(Color::LightGray),
             nomatch_style: Style::new().fg(Color::Red),

@@ -18,16 +18,16 @@ enum RCONCommand {
 impl RCONCommand {
     ///Returns the appropriate integer for the type
     pub fn to_i32(&self) -> i32 {
-        return match self {
+        match self {
             RCONCommand::ServerAuth => 3,
             RCONCommand::ServerAuthResponse => 2,
             RCONCommand::ServerExec => 2,
             RCONCommand::ServerResponseValue => 0,
             RCONCommand::Unknown(n) => *n,
-        };
+        }
     }
 
-    ///Gets an RCON command from an integer. 2 is mapped to two seperate types of packets, but one of them is only used in a server response  
+    ///Gets an RCON command from an integer. 2 is mapped to two seperate types of packets, but one of them is only used in a server response
     pub fn from_i32(n: i32, is_response: bool) -> RCONCommand {
         match n {
             3 => RCONCommand::ServerAuth,
@@ -141,7 +141,7 @@ impl RCONConnection {
             id,
         };
 
-        return Ok(conn);
+        Ok(conn)
     }
 
     pub async fn auth(&mut self, password: &str) -> std::io::Result<()> {
