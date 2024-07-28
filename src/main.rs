@@ -27,7 +27,7 @@ struct Args {
     port: u16,
 
     #[argh(option, description = "RCON password", short = 'P')]
-    password: String,
+    password: Option<String>,
 
     #[argh(
         option,
@@ -86,14 +86,23 @@ async fn main() {
         }
     }
 
-    match rcon.auth(&args.password).await {
-        Ok(_) => {
-            print_if_not_silent("Logged in.".white(), &args);
+    // Should only really fail if STDOUT or STDIN is closed, in which case a password
+    // must be provided via -p
+    let password = args.password.clone().or_else(|| rpassword::prompt_password("Insert password: ".white()).ok());
+
+    if let Some(password) = password {
+        match rcon.auth(&password).await {
+            Ok(_) => {
+                print_if_not_silent("Logged in.".white(), &args);
+            }
+            Err(_) => {
+                print_if_not_silent("Failed to log in.".red(), &args);
+                std::process::exit(1);
+            }
         }
-        Err(_) => {
-            print_if_not_silent("Failed to log in.".red(), &args);
-            std::process::exit(1);
-        }
+    } else {
+        print_if_not_silent("Password must be provided either with -p or with the interactive prompt.".red(), &args);
+        std::process::exit(1);
     }
 
     if args.commands.len() > 0 {
